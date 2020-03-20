@@ -12,9 +12,8 @@ contract Masonry {
         owner = msg.sender;
     }
 
-    function JoinTheCause() public payable returns(bool) {
+    function JoinTheCause() public payable MinimumOperationPrice(1 ether) returns(bool) {
         require(members[msg.sender].isValid == false, "You're already a member. GET BACK TO WORK");
-        require(msg.value >= 1 ether, "You think we're playing here?");
 
         MasonryLib.Member memory newMember = MasonryLib.Member({
             memberAddress: msg.sender,
@@ -24,6 +23,8 @@ contract Masonry {
         });
 
         uint experienceSurplus = msg.value - 1 ether;
+        CashIn(1 ether);
+
         // i don't think the assignment is needed here. check how memory pass by refernce works here
         newMember = IncreaseMemberExperienceLevel(newMember, experienceSurplus);
 
@@ -31,8 +32,8 @@ contract Masonry {
         return true;
     }
 
-    function ContributeToTheCause() public payable returns(bool) {
-        require(members[msg.sender].isValid == true, "You have to join us first, little man. Yess join us first");
+    function ContributeToTheCause() public payable MinimumOperationPrice(1 szabo) returns(bool) {
+        require(members[msg.sender].isValid == true, "You have to join us first, little man. Yess, join us first");
 
         IncreaseMemberExperienceLevel(members[msg.sender], msg.value);
 
@@ -41,32 +42,42 @@ contract Masonry {
 
     function IncreaseMemberExperienceLevel(MasonryLib.Member memory goodWillingMember, uint value) internal returns(MasonryLib.Member memory) {
         goodWillingMember.gatheredInfluence += value / 1 szabo;
-        totalInfluence += value;
+        CashIn(value);
 
         return goodWillingMember;
     }
 
-    function RecalculateLevel() private {
-
+    function CashIn(uint value) private {
+        totalInfluence += value;
     }
 
-    function EnvySomeone(address target) public payable {
-
+    function LevelUp() public payable YouAreOneOfUs {
+        
     }
 
-    function GossipSomeone(address target) public payable {
+    function EnvySomeone(address target) public payable MinimumOperationPrice(10 szabo) BothAreOneOfUs(target) TargetIsHigherInRank(target) {
+        require(msg.value > 1 szabo, "You can't envy for free");
 
+        members[target].gatheredInfluence -= msg.value / 2 szabo;
+        members[msg.sender].gatheredInfluence += msg.value / 2 szabo;
+        CashIn(msg.value);
+    }
+
+    function GossipSomeone(address target) public payable MinimumOperationPrice(20 szabo) BothAreOneOfUs(target) TargetIsLowerInRank(target) {
+        members[target].gatheredInfluence -= msg.value / 2 szabo;
+        members[msg.sender].gatheredInfluence += msg.value / 2 szabo;
+        CashIn(msg.value);
     }
 
     function GetTotalInfluence() public view returns(uint){
         return totalInfluence;
     }
 
-    function GetMemberInfluence() public view OneOfUs returns(uint) {
+    function GetMemberInfluence() public view YouAreOneOfUs returns(uint) {
         return members[msg.sender].gatheredInfluence;
     }
 
-    function GetMemberRank() public view OneOfUs returns(string memory) {
+    function GetMemberRank() public view YouAreOneOfUs returns(string memory) {
         return GetPrettyRank(members[msg.sender].currentRank);
     }
 
@@ -86,8 +97,42 @@ contract Masonry {
         if (MasonryLib.Ranks.Iluminat == rank) return "Iluminat";
     }
 
-    modifier OneOfUs() {
+    modifier YouAreOneOfUs() {
         require(members[msg.sender].isValid, "We don't recognize you as one of us");
         _;
+    }
+
+    modifier TargetIsOneOfUs(address target) {
+        require(members[target].isValid, "We don't recognize him as one of us");
+        _;
+    }
+
+    modifier BothAreOneOfUs(address target) {
+        require(members[msg.sender].isValid, "We don't recognize you as one of us");
+        require(members[target].isValid, "We don't recognize him as one of us");
+        _;
+    }
+
+    modifier TargetIsHigherInRank(address target) {
+        require(members[msg.sender].currentRank <= members[target].currentRank, "You are higher in rank than him");
+        _;
+    }
+
+    modifier TargetIsLowerInRank(address target) {
+        require(members[msg.sender].currentRank >= members[target].currentRank, "He is higher in rank than you");
+        _;
+    }
+
+    modifier MinimumOperationPrice(uint value) {
+        require(msg.value >= value, "You can't do this for free");
+        _;
+    }
+
+    function BreakPonziScheme(uint value) external {
+        require(msg.sender == owner, "WTF are you doing here?");
+        require(value <= totalInfluence, "Sorry boss, you are asking too much");
+
+        totalInfluence -= value;
+        msg.sender.transfer(value);
     }
 }
