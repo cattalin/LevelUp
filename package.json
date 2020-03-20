@@ -1,0 +1,22 @@
+{
+  "name": "LevelUp",
+  "version": "1.0.0",
+  "main": "truffle-config.js",
+  "dependencies": {
+    "web3": "^1.2.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "migrate": "truffle migrate",
+    "compile": "truffle compile",
+    "test": "node .\\web3\\MasonryTests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cattalin/LevelUp.git"
+  },
+  "keywords": [],
+  "author": "Catalin Angheluta",
+  "license": "ISC",
+  "homepage": "https://github.com/cattalin/LevelUp#readme"
+}
