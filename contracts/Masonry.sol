@@ -1,6 +1,6 @@
 pragma solidity >=0.4.21 <0.7.0;
 
-import "./MasonryLib.sol";
+import { MasonryLib } from "./MasonryLib.sol";
 
 contract Masonry {
     address private owner;
@@ -8,7 +8,7 @@ contract Masonry {
     
     mapping(address => MasonryLib.Member) public members;
 
-    constructor() public{
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -78,23 +78,7 @@ contract Masonry {
     }
 
     function GetMemberRank() public view YouAreOneOfUs returns(string memory) {
-        return GetPrettyRank(members[msg.sender].currentRank);
-    }
-
-    function GetPrettyRank(MasonryLib.Ranks rank) private pure returns(string memory){
-        require(uint8(rank) <= 12, 'Wrong rank');
-        if (MasonryLib.Ranks.Calfa == rank) return "Calfa";
-        if (MasonryLib.Ranks.Pacalici == rank) return "Pacalici";
-        if (MasonryLib.Ranks.Lingau == rank) return "Lingau";
-        if (MasonryLib.Ranks.LingauAvansat == rank) return "LingauAvansat";
-        if (MasonryLib.Ranks.Pupincurist == rank) return "Pupincurist";
-        if (MasonryLib.Ranks.PupincuristInfluent == rank) return "PupincuristInfluent";
-        if (MasonryLib.Ranks.Influencer == rank) return "Influencer";
-        if (MasonryLib.Ranks.Manager == rank) return "Manager";
-        if (MasonryLib.Ranks.BatranIntelept == rank) return "BatranIntelept";
-        if (MasonryLib.Ranks.Maestru == rank) return "Maestru";
-        if (MasonryLib.Ranks.MareMaestru == rank) return "MareMaestru";
-        if (MasonryLib.Ranks.Iluminat == rank) return "Iluminat";
+        return MasonryLib.GetPrettyRank(members[msg.sender].currentRank);
     }
 
     modifier YouAreOneOfUs() {
