@@ -1,4 +1,4 @@
-//fucking initializations
+//initializations
 const fs = require('fs');
 const contractJson = JSON.parse(fs.readFileSync('./build/contracts/Masonry.json', 'utf8'));
 const contractAbi = contractJson.abi;
@@ -7,11 +7,10 @@ var Web3 = require('web3');
 var web3Provider = new Web3.providers.HttpProvider('http://localhost:7545')
 var web3 = new Web3(web3Provider);
 const { toHex } = web3.utils;
-//end fucking initializations
+//end initializations
 
 var contractAddress = '0xa99D10096FaFF5c9bE71154a8EfE23196d85E260';
 const contract = new web3.eth.Contract(contractAbi, contractAddress);
-// contract.defaultAccount = '0xfc1Ee3C66b6a25Dc0c88bA85D2f37496Cd0250eC'; merge o pula
 
 // SendJoinTheCause()
 // CallMemberStatuses();
@@ -40,7 +39,7 @@ function CallGetTotalInfluence(){
 }
 
 function SendJoinTheCause(){
-    contract.methods.JoinTheCause().send({from: '0xfc1Ee3C66b6a25Dc0c88bA85D2f37496Cd0250eC', value:2*(10**18), gas:5000000})
+    contract.methods.JoinTheCause().send({from: '0xfc1Ee3C66b6a25Dc0c88bA85D2f37496Cd0250eC', value:ToEthereum(2), gas:5000000})
     .then((res) => {
         console.log(res);
 
@@ -51,7 +50,7 @@ function SendJoinTheCause(){
 }
 
 function SendContributeToTheCause(){
-    contract.methods.JoinTheCause().send({from: '0xfc1Ee3C66b6a25Dc0c88bA85D2f37496Cd0250eC', value:2*(10**18), gas:5000000})
+    contract.methods.JoinTheCause().send({from: '0xfc1Ee3C66b6a25Dc0c88bA85D2f37496Cd0250eC', value:ToEthereum(2), gas:5000000})
     .then((res) => {
         console.log(res);
 
@@ -62,7 +61,8 @@ function SendContributeToTheCause(){
 }
 
 function SendStealMoney(){
-    let desiredValue = 0.5*(10**18);
+    let desiredValue = ToEthereum(0.5);
+
     contract.methods.BreakPonziScheme(toHex(desiredValue)).send({from: '0xfB1aeBC7606Ed73f95D7713d1Af2BA0f9c834999', gas:5000000})
     .then((res) => {
         console.log(res);
@@ -71,4 +71,10 @@ function SendStealMoney(){
         .then(console.log)
     })
     .catch(console.log)
+}
+
+function ToEthereum(desiredValue){
+    let wei = desiredValue*(10**18);
+
+    return wei
 }
