@@ -1,23 +1,19 @@
 pragma solidity >=0.4.21 <0.7.0;
 
-import { MasonryLib } from "./MasonryLib.sol";
+import { MasonryLib as Lib } from "./MasonryLib.sol";
+import { MasonryCore as Core } from "./MasonryCore.sol";
 
-contract Masonry {
-    address private owner;
-    uint private totalInfluence;
-    
-    mapping(address => MasonryLib.Member) public members;
-
+contract Masonry is Core {
     constructor() public {
         owner = msg.sender;
     }
 
-    function JoinTheCause() public payable MinimumOperationPrice(1 ether) returns(bool) {
+    function JoinTheCause() external payable MinimumOperationPrice(1 ether) returns(bool) {
         require(members[msg.sender].isValid == false, "You're already a member. GET BACK TO WORK");
 
-        MasonryLib.Member memory newMember = MasonryLib.Member({
+        Lib.Member memory newMember = Lib.Member({
             memberAddress: msg.sender,
-            currentRank: MasonryLib.Ranks.Calfa,
+            currentRank: Lib.Ranks.Calfa,
             gatheredInfluence: 0,
             isValid: true
         });
@@ -32,7 +28,7 @@ contract Masonry {
         return true;
     }
 
-    function ContributeToTheCause() public payable MinimumOperationPrice(1 szabo) returns(bool) {
+    function ContributeToTheCause() external payable MinimumOperationPrice(1 szabo) returns(bool) {
         require(members[msg.sender].isValid == true, "You have to join us first, little man. Yess, join us first");
 
         IncreaseMemberExperienceLevel(members[msg.sender], msg.value);
@@ -40,18 +36,14 @@ contract Masonry {
         return true;
     }
 
-    function IncreaseMemberExperienceLevel(MasonryLib.Member memory goodWillingMember, uint value) internal returns(MasonryLib.Member memory) {
+    function IncreaseMemberExperienceLevel(Lib.Member memory goodWillingMember, uint value) internal returns(Lib.Member memory) {
         goodWillingMember.gatheredInfluence += value / 1 szabo;
         CashIn(value);
 
         return goodWillingMember;
     }
 
-    function CashIn(uint value) private {
-        totalInfluence += value;
-    }
-
-    function LevelUp() public payable YouAreOneOfUs {
+    function LevelUp() external payable YouAreOneOfUs {
         
     }
 
@@ -69,54 +61,31 @@ contract Masonry {
         CashIn(msg.value);
     }
 
-    function GetTotalInfluence() public view returns(uint){
-        return totalInfluence;
-    }
-
-    function GetMemberInfluence() public view YouAreOneOfUs returns(uint) {
-        return members[msg.sender].gatheredInfluence;
-    }
-
-    function GetMemberRank() public view YouAreOneOfUs returns(string memory) {
-        return MasonryLib.GetPrettyRank(members[msg.sender].currentRank);
-    }
-
-    modifier YouAreOneOfUs() {
-        require(members[msg.sender].isValid, "We don't recognize you as one of us");
-        _;
-    }
-
-    modifier TargetIsOneOfUs(address target) {
-        require(members[target].isValid, "We don't recognize him as one of us");
-        _;
-    }
-
-    modifier BothAreOneOfUs(address target) {
-        require(members[msg.sender].isValid, "We don't recognize you as one of us");
-        require(members[target].isValid, "We don't recognize him as one of us");
-        _;
-    }
-
-    modifier TargetIsHigherInRank(address target) {
-        require(members[msg.sender].currentRank <= members[target].currentRank, "You are higher in rank than him");
-        _;
-    }
-
-    modifier TargetIsLowerInRank(address target) {
-        require(members[msg.sender].currentRank >= members[target].currentRank, "He is higher in rank than you");
-        _;
-    }
-
-    modifier MinimumOperationPrice(uint value) {
-        require(msg.value >= value, "You can't do this for free");
-        _;
-    }
-
     function BreakPonziScheme(uint value) external {
         require(msg.sender == owner, "WTF are you doing here?");
         require(value <= totalInfluence, "Sorry boss, you are asking too much");
 
-        totalInfluence -= value;
+        CashOut(value);
         msg.sender.transfer(value);
+    }
+
+    function CashIn(uint value) private {
+        totalInfluence += value;
+    }
+
+    function CashOut(uint value) private {
+        totalInfluence -= value;
+    }
+
+    function GetMemberRank() public view YouAreOneOfUs returns(string memory) {
+        return Lib.GetPrettyRank(members[msg.sender].currentRank);
+    }
+
+    function GetMemberInfluence() external view YouAreOneOfUs returns(uint) {
+        return members[msg.sender].gatheredInfluence;
+    }
+
+    function GetTotalInfluence() external view returns(uint){
+        return totalInfluence;
     }
 }
