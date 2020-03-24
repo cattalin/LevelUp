@@ -1,4 +1,4 @@
-import { ToEthereum } from "../jsUtils/ethUtils";
+import { ToEthereum } from "../web3/Utils";
 const Masonry = artifacts.require("Masonry");
 
 

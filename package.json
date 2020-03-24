@@ -1,15 +1,19 @@
 {
   "name": "LevelUp",
   "version": "1.0.0",
-  "main": "truffle-config.js",
+  "main": "./truffle-config.js",
+  "@std/esm": "cjs",
   "dependencies": {
+    
+    "@std/esm": "^0.26.0",
+    "node": "^12.11.1",
     "web3": "^1.2.6"
   },
   "devDependencies": {},
   "scripts": {
     "migrate": "truffle migrate",
     "compile": "truffle compile",
-    "test": "node .\\web3\\MasonryTests.js"
+    "test": "node ./web3/MembershipTests"
   },
   "repository": {
     "type": "git",

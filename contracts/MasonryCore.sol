@@ -10,6 +10,9 @@ contract MasonryCore {
         owner = msg.sender;
     }
 
+    event MemberJoined();
+    event MemberContributed();
+
     modifier YouAreOneOfUs() {
         require(members[msg.sender].isValid, "We don't recognize you as one of us");
         _;
