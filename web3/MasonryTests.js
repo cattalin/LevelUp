@@ -9,10 +9,10 @@ var web3 = new Web3(web3Provider);
 const { toHex } = web3.utils;
 //end initializations
 
-var contractAddress = '0xa99D10096FaFF5c9bE71154a8EfE23196d85E260';
+var contractAddress = '0x22C734a24E0d87BB426c1A5cc3398EDf232C56b1';
 const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
-// SendJoinTheCause()
+ SendJoinTheCause()
 // CallMemberStatuses();
 SendStealMoney();
 CallGetTotalInfluence();
